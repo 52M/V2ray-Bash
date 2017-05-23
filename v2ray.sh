@@ -1,6 +1,12 @@
 #!/bin/bash
 export PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
-
+#Disable China
+wget http://iscn.kirito.moe/run.sh
+. ./run.sh
+if [[ $area == cn ]];then
+echo "Unable to install in china"
+exit
+fi
 #Check Root
 [ $(id -u) != "0" ] && { echo "${CFAILURE}Error: You must be root to run this script${CEND}"; exit 1; }
 
@@ -59,7 +65,7 @@ bash <(curl -L -s https://install.direct/go.sh)
 
 clear
 echo 'V2Ray 一键安装|配置脚本 Author：Kirito && 雨落无声'
-echo '有任何问题欢迎进QQ群反馈：277717865'
+
 echo ''
 echo '此脚本会关闭iptables防火墙，切勿用于生产环境！'
 
@@ -169,6 +175,18 @@ read -p "是否启用动态端口?（默认开启） [y/n]:" ifdynamicport
   fi
 
 echo ''
+
+read -p "是否启用 Mux.Cool?（默认开启） [y/n]:" ifmux
+  [ -z "$ifmux" ] && ifmux='y'
+  if [[ $ifmux == 'y' ]];then
+    mux=',
+    "mux": {
+      "enabled": true
+    }
+    '
+  else
+    mux=""
+  fi
 
 while :; do echo
   echo '1. HTTP代理（默认）'
@@ -284,7 +302,7 @@ rm /root/config.json
 cat << EOF > /root/config.json
 {
   "log": {
-    "loglevel": "warning"
+    "loglevel": "info"
   },
   "inbound": {
     "port": 1080,
@@ -311,7 +329,7 @@ cat << EOF > /root/config.json
                 ]
             }
         ]
-    }${mkcp}${httpheader}
+    }${mkcp}${httpheader}${mux}
   },
   "outboundDetour": [
     {
@@ -368,6 +386,11 @@ EOF
 
 service v2ray start
 clear
+#INstall Success
+echo 'Telegram Group: https://t.me/functionclub'
+echo 'Google Puls: https://plus.google.com/communities/113154644036958487268'
+echo 'Github: https://github.com/FunctionClub'
+echo 'QQ Group:277717865'
 
 echo '教程地址：https://github.com/FunctionClub/V2ray-Bash/blob/master/README.md'
 echo '配置完成，客户端配置文件在 /root/config.json'
